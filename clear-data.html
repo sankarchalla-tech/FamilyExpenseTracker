@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear App Data - Family Expense Tracker</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .description {
+            color: #4a5568;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        .success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .status {
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 14px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Family Expense Tracker</h1>
+        <p class="description">
+            This page will clear all problematic data from your browser's local storage, 
+            allowing you to start fresh with the correct user and family selections.
+        </p>
+
+        <div class="button-group">
+            <button class="btn btn-danger" onclick="clearAllData()">
+                🗑️ Clear All Data
+            </button>
+            <button class="btn btn-primary" onclick="goToApp()">
+                🚀 Go to App
+            </button>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function clearAllData() {
+            localStorage.clear();
+            document.getElementById('status').innerHTML = 
+                '<div class="success">✅ All local storage data cleared!</div>';
+            
+            // Clear session storage as well
+            if (typeof(Storage) !== 'undefined') {
+                sessionStorage.clear();
+            }
+        }
+        
+        function goToApp() {
+            window.location.href = 'http://localhost:5173';
+        }
+        
+        // Show current data status
+        function checkStorage() {
+            const keys = Object.keys(localStorage);
+            const statusDiv = document.getElementById('status');
+            
+            if (keys.length === 0) {
+                statusDiv.innerHTML = 
+                    '<div class="status">ℹ️ No data in local storage</div>';
+            } else {
+                let statusText = '<div class="status">📦 Current data in local storage:</div><ul>';
+                
+                keys.forEach(key => {
+                    try {
+                        const value = localStorage.getItem(key);
+                        if (key.includes('password')) {
+                            statusText += `<li><strong>${key}:</strong> [HIDDEN]</li>`;
+                        } else if (key === 'selectedFamily') {
+                            const family = JSON.parse(value);
+                            statusText += `<li><strong>${key}:</strong> Family ID ${family.id}</li>`;
+                        } else if (key.length > 50) {
+                            statusText += `<li><strong>${key}:</strong> [Large data - ${value.length} chars]</li>`;
+                        } else {
+                            statusText += `<li><strong>${key}:</strong> ${value}</li>`;
+                        }
+                    } catch (e) {
+                        statusText += `<li><strong>${key}:</strong> [Error reading]</li>`;
+                    }
+                });
+                
+                statusText += '</ul>';
+                statusDiv.innerHTML = statusText;
+            }
+        }
+        
+        // Check storage on load
+        checkStorage();
+    </script>
+</body>
+</html>
