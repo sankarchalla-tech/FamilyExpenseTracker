@@ -46,9 +46,14 @@ export const FamilyProvider = ({ children }) => {
     }
   }, [selectedFamily]);
 
+  const isAdmin = () => {
+    return selectedFamily?.role === 'admin';
+  };
+
   const value = {
     selectedFamily,
     setSelectedFamily,
+    isAdmin,
   };
 
   return <FamilyContext.Provider value={value}>{children}</FamilyContext.Provider>;

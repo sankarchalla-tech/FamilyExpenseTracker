@@ -210,6 +210,38 @@ const db = {
     return result.rows[0];
   },
 
+  updateCategory: async (id, familyId, updates) => {
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+    
+    Object.keys(updates).forEach(key => {
+      if (updates[key] !== undefined) {
+        fields.push(`${key} = $${paramIndex++}`);
+        values.push(updates[key]);
+      }
+    });
+    
+    if (fields.length === 0) return null;
+    
+    values.push(id, familyId);
+    
+    const result = await pool.query(
+      `UPDATE categories SET ${fields.join(', ')} WHERE id = $${paramIndex++} AND family_id = $${paramIndex} AND is_default = false RETURNING *`,
+      values
+    );
+    
+    return result.rows[0];
+  },
+
+  deleteCategory: async (id, familyId) => {
+    const result = await pool.query(
+      'DELETE FROM categories WHERE id = $1 AND family_id = $2 AND is_default = false RETURNING *',
+      [id, familyId]
+    );
+    return result.rows[0];
+  },
+
   getAnalytics: async (familyId, startDate, endDate, userId = null) => {
     const params = userId ? [familyId, startDate, endDate, parseInt(userId)] : [familyId, startDate, endDate];
 

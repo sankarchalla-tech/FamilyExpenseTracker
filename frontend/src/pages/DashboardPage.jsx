@@ -6,17 +6,17 @@ import { familyAPI } from '../api/family';
 import { expenseAPI } from '../api/expense';
 import { categoryAPI } from '../api/category';
 import { analyticsAPI } from '../api/analytics';
-import { incomeAPI } from '../api/income';
-import { futureExpenseAPI } from '../api/futureExpense';
+
 import CashFlowSummary from '../components/CashFlowSummary';
 import IncomeTable from '../components/IncomeTable';
 import EnhancedExpenseTable from '../components/EnhancedExpenseTable';
 import CategoryDonutChart from '../components/CategoryDonutChart';
 import FutureExpenseTable from '../components/FutureExpenseTable';
+import FamilyMembers from '../components/FamilyMembers';
 
 function DashboardPage() {
-  const { user, logout } = useAuth();
-  const { selectedFamily, setSelectedFamily } = useFamily();
+  const { user } = useAuth();
+  const { selectedFamily, setSelectedFamily, isAdmin } = useFamily();
   const [families, setFamilies] = useState([]);
   const [showCreateFamily, setShowCreateFamily] = useState(false);
   const [newFamilyName, setNewFamilyName] = useState('');
@@ -26,7 +26,6 @@ function DashboardPage() {
   const [expenses, setExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedMember, setSelectedMember] = useState('all');
-  const [showAddExpense, setShowAddExpense] = useState(false);
   const [loading, setLoading] = useState(true);
   const [familyMembers, setFamilyMembers] = useState([]);
   const navigate = useNavigate();
@@ -149,16 +148,21 @@ function DashboardPage() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+
 
   const handleEditExpense = (expense) => {
     navigate(`/family/${selectedFamily?.id}/expenses`, { state: { editingExpense: expense } });
   };
 
-  const handleDeleteExpense = async (expenseId) => {
+  const handleDeleteExpense = async (expenseId, expenseUserId) => {
+    // Only admins can delete any expense, regular users can only delete their own
+    const canDelete = isAdmin() || expenseUserId === user?.id;
+    
+    if (!canDelete) {
+      alert('You can only delete your own expenses');
+      return;
+    }
+    
     if (!confirm('Are you sure you want to delete this expense?')) return;
     
     try {
@@ -179,9 +183,16 @@ function DashboardPage() {
       <nav className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Family Expense Tracker
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                Family Expense Tracker
+              </h1>
+              {selectedFamily && isAdmin() && (
+                <span className="px-2 py-1 text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 rounded-full font-medium">
+                  Admin
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-4">
               <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -189,7 +200,7 @@ function DashboardPage() {
                 </label>
                 <select
                   value={selectedMember || 'all'}
-                  onChange={(e) => onMemberChange(e.target.value)}
+                  onChange={(e) => setSelectedMember(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
                 >
                   <option value="all">All Members</option>
@@ -202,7 +213,7 @@ function DashboardPage() {
                 </select>
               </div>
               <button
-                onClick={() => onMemberChange(user?.id)}
+                onClick={() => setSelectedMember(user?.id)}
                 className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg text-sm"
               >
                 Mine Only
@@ -342,6 +353,34 @@ function DashboardPage() {
             <div className="space-y-6">
               {activeTab === 'dashboard' && (
                 <>
+                  {isAdmin() && (
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl shadow-sm p-6 mb-6">
+                      <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-300 mb-3">
+                        👑 Admin Panel
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <button
+                          onClick={() => navigate(`/family/${selectedFamily?.id}`)}
+                          className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg text-sm"
+                        >
+                          Manage Members
+                        </button>
+                        <button
+                          onClick={() => navigate(`/family/${selectedFamily?.id}/categories`)}
+                          className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg text-sm"
+                        >
+                          Manage Categories
+                        </button>
+                        <button
+                          onClick={() => navigate(`/family/${selectedFamily?.id}/settings`)}
+                          className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg text-sm"
+                        >
+                          Family Settings
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <CashFlowSummary analytics={analytics} />
                     <CategoryDonutChart analytics={analytics} />
@@ -436,6 +475,8 @@ function DashboardPage() {
                     onEdit={handleEditExpense}
                     onDelete={handleDeleteExpense}
                     selectedMonth={selectedMonth}
+                    currentUser={user}
+                    isAdmin={isAdmin()}
                   />
                 </>
               )}
@@ -445,14 +486,16 @@ function DashboardPage() {
               )}
             </div>
 
-            <div className="mt-8">
-              <Link
-                to={`/family/${selectedFamily?.id}`}
-                className="block w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-center transition-colors"
-              >
-                Manage Family Members
-              </Link>
-            </div>
+            {isAdmin() && (
+              <div className="mt-8">
+                <Link
+                  to={`/family/${selectedFamily?.id}`}
+                  className="block w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-center transition-colors"
+                >
+                  Manage Family Members
+                </Link>
+              </div>
+            )}
           </>
         )}
 

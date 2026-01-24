@@ -1,4 +1,4 @@
-export default function EnhancedExpenseTable({ expenses, categories, onEdit, onDelete, selectedMonth }) {
+export default function EnhancedExpenseTable({ expenses, categories, onEdit, onDelete, selectedMonth, currentUser, isAdmin }) {
   if (!expenses || expenses.length === 0) {
     return (
       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
@@ -108,24 +108,27 @@ export default function EnhancedExpenseTable({ expenses, categories, onEdit, onD
                     <td className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white text-right">
                       ₹{expense.amount?.toFixed(2) || '0.00'}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right">
-                      {onEdit && (
-                        <button
-                          onClick={() => onEdit(expense)}
-                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 mr-2"
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {onDelete && (
-                        <button
-                          onClick={() => onDelete(expense.id)}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
+                     <td className="px-4 py-3 text-sm text-right">
+                       {onEdit && (isAdmin || expense.user_id === currentUser?.id) && (
+                         <button
+                           onClick={() => onEdit(expense)}
+                           className="text-blue-600 hover:text-blue-900 dark:text-blue-400 mr-2"
+                         >
+                           Edit
+                         </button>
+                       )}
+                       {onDelete && (isAdmin || expense.user_id === currentUser?.id) && (
+                         <button
+                           onClick={() => onDelete(expense.id, expense.user_id)}
+                           className="text-red-600 hover:text-red-900 dark:text-red-400"
+                         >
+                           Delete
+                         </button>
+                       )}
+                       {!isAdmin && expense.user_id !== currentUser?.id && (
+                         <span className="text-gray-400 text-xs">Read-only</span>
+                       )}
+                     </td>
                   </tr>
                 );
               })

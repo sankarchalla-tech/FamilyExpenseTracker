@@ -7,6 +7,8 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import FamilyPage from './pages/FamilyPage';
 import ExpensesPage from './pages/ExpensesPage';
+import CategoriesPage from './pages/CategoriesPage';
+import FamilySettingsPage from './pages/FamilySettingsPage';
 import PasswordSettings from './pages/PasswordSettings';
 import ProfilePage from './pages/ProfilePage';
 
@@ -53,9 +55,19 @@ function AppRoutes() {
           <FamilyPage />
         </ProtectedRoute>
       } />
-       <Route path="/family/:familyId/expenses" element={
+        <Route path="/family/:familyId/expenses" element={
           <ProtectedRoute>
             <ExpensesPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/family/:familyId/categories" element={
+          <ProtectedRoute>
+            <CategoriesPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/family/:familyId/settings" element={
+          <ProtectedRoute>
+            <FamilySettingsPage />
           </ProtectedRoute>
         } />
         <Route path="/settings/password" element={
