@@ -4,6 +4,9 @@ const path = require('path');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // for development purposes; adjust as needed for production
+  },
 });
 
 async function initializeDatabase() {

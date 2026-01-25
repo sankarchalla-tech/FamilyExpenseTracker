@@ -10,6 +10,9 @@ const PORT = process.env.PORT || 5000;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // for development purposes; adjust as needed for production
+  },
 });
 
 app.use(cors());
