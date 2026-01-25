@@ -195,19 +195,19 @@ function DashboardPage() {
             </div>
             <div className="flex items-center gap-4">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Family Member
-                </label>
+                {/* <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Family
+                </label> */}
                 <select
-                  value={selectedMember || 'all'}
-                  onChange={(e) => setSelectedMember(e.target.value)}
+                  value={selectedFamily || 'all'}
+                  onChange={(e) => setSelectedFamily(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="all">All Members</option>
-                  {familyMembers.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.name}
-                      {member.id === user?.id && ' (You)'}
+                  <option value="all">All Families</option>
+                  {families.map((family) => (
+                    <option key={family.id} value={family.id}>
+                      {family.name}
+                      {family.id === user?.id && ' (You)'}
                     </option>
                   ))}
                 </select>
