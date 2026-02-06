@@ -21,7 +21,7 @@ export const FamilyProvider = ({ children }) => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Validate that the saved family has the required structure
+        // Validate that saved family has the required structure
         if (parsed && typeof parsed.id === 'number') {
           return parsed;
         } else {
@@ -38,6 +38,16 @@ export const FamilyProvider = ({ children }) => {
     return null;
   });
 
+  // Function to update family and ensure localStorage is updated
+  const updateSelectedFamily = (family) => {
+    setSelectedFamily(family);
+    if (family) {
+      localStorage.setItem('selectedFamily', JSON.stringify(family));
+    } else {
+      localStorage.removeItem('selectedFamily');
+    }
+  };
+
   useEffect(() => {
     if (selectedFamily) {
       localStorage.setItem('selectedFamily', JSON.stringify(selectedFamily));
@@ -52,7 +62,7 @@ export const FamilyProvider = ({ children }) => {
 
   const value = {
     selectedFamily,
-    setSelectedFamily,
+    setSelectedFamily: updateSelectedFamily,
     isAdmin,
   };
 

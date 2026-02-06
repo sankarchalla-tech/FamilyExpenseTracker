@@ -22,4 +22,6 @@ router.post('/:familyId/members', auth, [
 
 router.delete('/:familyId/members/:userId', auth, familyController.removeFamilyMember);
 
+router.delete('/:familyId', auth, familyController.deleteFamily);
+
 module.exports = router;

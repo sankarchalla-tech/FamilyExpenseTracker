@@ -30,4 +30,9 @@ export const familyAPI = {
     const response = await api.get(`/families/${familyId}/members`);
     return response.data;
   },
+
+  deleteFamily: async (familyId) => {
+    const response = await api.delete(`/families/${familyId}`);
+    return response.data;
+  },
 };

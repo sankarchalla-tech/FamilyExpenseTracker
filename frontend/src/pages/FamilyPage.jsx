@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useFamily } from '../context/FamilyContext';
 import { familyAPI } from '../api/family';
 import UserManagement from '../components/UserManagement';
+import FamilyMemberManagement from '../components/FamilyMemberManagement';
 
 function FamilyPage() {
   const { user } = useAuth();
@@ -163,16 +164,13 @@ function FamilyPage() {
             </div>
           </div>
           
-          {/* User Management Section for Admins */}
-          {canManageMembers && (
-            <div className="mb-6">
-              <UserManagement 
-                familyId={familyId}
-                familyMembers={family.members || []}
-                onUpdate={() => loadFamily()}
-              />
-            </div>
-          )}
+          {/* Family Member Management Section */}
+          <FamilyMemberManagement
+            familyId={familyId}
+            isAdmin={canManageMembers}
+            familyMembers={family.members || []}
+            onUpdate={() => loadFamily()}
+          />
 
           {family?.members && family.members.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -5,6 +5,8 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
   const [incomes, setIncomes] = useState([]);
   const [showAddIncome, setShowAddIncome] = useState(false);
   const [editingIncome, setEditingIncome] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     source: '',
     amount: '',
@@ -14,6 +16,8 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
 
   const loadIncomes = async () => {
     try {
+      setLoading(true);
+      setError('');
       const month = selectedMonth.toISOString().slice(0, 7);
       const filters = { month };
       if (selectedMember && selectedMember !== 'all') {
@@ -23,16 +27,40 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
       setIncomes(data);
     } catch (error) {
       console.error('Error loading incomes:', error);
+      setError('Failed to load incomes. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadIncomes();
+    console.log('IncomeTable useEffect:', { familyId, selectedMonth, selectedMember });
+    if (familyId) {
+      loadIncomes();
+    }
   }, [familyId, selectedMonth, selectedMember]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Basic frontend validation
+    if (!formData.source.trim()) {
+      setError('Source is required');
+      return;
+    }
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      setError('Amount must be greater than 0');
+      return;
+    }
+    if (!formData.month) {
+      setError('Month is required');
+      return;
+    }
+    
     try {
+      setLoading(true);
+      setError('');
+      
       if (editingIncome) {
         await incomeAPI.updateIncome(familyId, editingIncome.id, {
           ...formData,
@@ -55,6 +83,10 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
       loadIncomes();
     } catch (error) {
       console.error('Error saving income:', error);
+      const errorMessage = error.response?.data?.error || error.response?.data?.errors?.[0]?.msg || 'Failed to save income. Please try again.';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,10 +105,15 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
     if (!confirm('Are you sure you want to delete this income?')) return;
     
     try {
+      setLoading(true);
+      setError('');
       await incomeAPI.deleteIncome(familyId, incomeId);
       loadIncomes();
     } catch (error) {
       console.error('Error deleting income:', error);
+      setError('Failed to delete income. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,12 +127,19 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
         </h2>
         <button
           onClick={() => setShowAddIncome(true)}
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg"
+          disabled={loading}
+          className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg disabled:cursor-not-allowed"
         >
           + Add Income
         </button>
       </div>
 
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-red-800 dark:text-red-200">{error}</p>
+        </div>
+      )}
+      
       <div className="mb-4 p-4 bg-green-100 dark:bg-green-900/40 rounded-lg">
         <p className="text-green-900 dark:text-green-200">
           <span className="font-bold">Monthly Total:</span> ₹{monthlyTotal.toFixed(2)}
@@ -124,7 +168,13 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
             </tr>
           </thead>
           <tbody className="divide-y divide-green-200 dark:divide-green-800">
-            {incomes.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="5" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                  Loading...
+                </td>
+              </tr>
+            ) : incomes.length === 0 ? (
               <tr>
                 <td colSpan="5" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                   No income records for this month
@@ -172,58 +222,75 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               {editingIncome ? 'Edit Income' : 'Add New Income'}
             </h3>
+            {error && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-red-800 dark:text-red-200 text-sm">{error}</p>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Source *
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.source}
-                  onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-                  placeholder="Salary, Freelance, Business, etc."
-                />
+                 <input
+                   type="text"
+                   required
+                   value={formData.source}
+                   onChange={(e) => {
+                     setFormData({ ...formData, source: e.target.value });
+                     setError('');
+                   }}
+                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                   placeholder="Salary, Freelance, Business, etc."
+                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Amount (₹) *
                 </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  required
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-                  placeholder="0.00"
-                />
+                 <input
+                   type="number"
+                   step="0.01"
+                   min="0.01"
+                   required
+                   value={formData.amount}
+                   onChange={(e) => {
+                     setFormData({ ...formData, amount: e.target.value });
+                     setError('');
+                   }}
+                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                   placeholder="0.00"
+                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Month *
                 </label>
-                <input
-                  type="month"
-                  required
-                  value={formData.month}
-                  onChange={(e) => setFormData({ ...formData, month: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-                />
+                 <input
+                   type="month"
+                   required
+                   value={formData.month}
+                   onChange={(e) => {
+                     setFormData({ ...formData, month: e.target.value });
+                     setError('');
+                   }}
+                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Note (optional)
                 </label>
-                <textarea
-                  value={formData.note}
-                  onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-                  rows="3"
-                  placeholder="Add a note..."
-                />
+                 <textarea
+                   value={formData.note}
+                   onChange={(e) => {
+                     setFormData({ ...formData, note: e.target.value });
+                     setError('');
+                   }}
+                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                   rows="3"
+                   placeholder="Add a note..."
+                 />
               </div>
               <div className="flex gap-3 justify-end">
                 <button
@@ -244,9 +311,10 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg"
+                  disabled={loading}
+                  className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg disabled:cursor-not-allowed"
                 >
-                  {editingIncome ? 'Update' : 'Add'}
+                  {loading ? 'Saving...' : (editingIncome ? 'Update' : 'Add')}
                 </button>
               </div>
             </form>

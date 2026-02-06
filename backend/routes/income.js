@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const incomeController = require('../controllers/incomeController');
 const auth = require('../middleware/auth');
+const verifyFamilyMember = require('../middleware/verifyFamilyMember');
 
 const router = express.Router();
 

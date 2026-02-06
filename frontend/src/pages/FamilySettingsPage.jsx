@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFamily } from '../context/FamilyContext';
 import { familyAPI } from '../api/family';
+import FamilyMemberManagement from '../components/FamilyMemberManagement';
 
 function FamilySettingsPage() {
   const { user } = useAuth();
@@ -105,12 +106,17 @@ function FamilySettingsPage() {
       return;
     }
 
-    // This would require implementing deleteFamily API
-    console.log('Deleting family:', familyId);
-    setMessage({
-      type: 'error',
-      text: 'Delete functionality not implemented yet'
-    });
+    try {
+      await familyAPI.deleteFamily(familyId);
+      navigate('/dashboard');
+      // Clear selected family from context and localStorage
+      setSelectedFamily(null);
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.error || 'Failed to delete family'
+      });
+    }
   };
 
   if (loading) {
@@ -327,6 +333,26 @@ function FamilySettingsPage() {
               </div>
             </form>
           )}
+
+          {/* Family Member Management */}
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            {console.log('FamilySettings: isAdmin() =', isAdmin(), 'family.members =', family.members)}
+            {isAdmin() && (
+              <FamilyMemberManagement
+                familyId={familyId}
+                isAdmin={isAdmin()}
+                familyMembers={family.members || []}
+                onUpdate={loadFamily}
+              />
+            )}
+            {!isAdmin() && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <p className="text-yellow-800 dark:text-yellow-200 text-center">
+                  <strong>Access Denied:</strong> Only family administrators can manage family members.
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* Danger Zone */}
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">

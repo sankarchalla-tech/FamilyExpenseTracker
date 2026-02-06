@@ -15,9 +15,10 @@ const db = {
   
   createUser: async (name, email, passwordHash, username = null) => {
     const result = await pool.query(
-      'INSERT INTO users (name, email, password_hash, username) VALUES ($1, $2, $3, $4) RETURNING id, name, email, username, created_at',
+      'INSERT INTO users (name, email, password_hash, username) VALUES ($1, $2, $3, $4) RETURNING id, name, email, username, password_hash, created_at',
       [name, email, passwordHash, username]
     );
+
     return result.rows[0];
   },
   

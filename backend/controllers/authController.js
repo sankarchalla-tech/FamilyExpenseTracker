@@ -48,28 +48,51 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
+    console.log('=== LOGIN ATTEMPT ===');
+    console.log('Request body:', req.body);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
     
     const { login, email, password } = req.body;
     const loginInput = login || email;
     
+    console.log('Login input:', loginInput);
+    console.log('Password provided:', password ? 'YES' : 'NO');
+    
     let user;
     
     if (loginInput && loginInput.includes('@')) {
+      console.log('Searching by email...');
       user = await db.getUserByEmail(loginInput);
     } else {
+      console.log('Searching by username...');
       user = await db.getUserByUsername(loginInput);
     }
     
+    console.log('User found:', user ? {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      hasPasswordHash: !!user.password_hash
+    } : 'NO');
+    
     if (!user) {
+      console.log('USER NOT FOUND - returning 401');
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
+    console.log('Comparing passwords...');
+    console.log('Stored hash length:', user.password_hash ? user.password_hash.length : 0);
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    console.log('Password comparison result:', isValidPassword);
+    
     if (!isValidPassword) {
+      console.log('INVALID PASSWORD - returning 401');
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
