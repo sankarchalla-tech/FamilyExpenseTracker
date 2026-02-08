@@ -216,7 +216,7 @@ function DashboardPage() {
                     if (familyId === 'all') {
                       setSelectedFamily(null);
                     } else {
-                      const family = families.find(f => f.id === familyId);
+                      const family = families.find(f => f.id == familyId);
                       setSelectedFamily(family);
                     }
                   }}
@@ -232,8 +232,11 @@ function DashboardPage() {
                 </select>
               </div>
               <button
-                onClick={() => setSelectedMember(user?.id)}
-                className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg text-sm"
+                onClick={() => {
+                  logger.log('Mine Only button clicked in nav, user ID:', user?.id);
+                  setSelectedMember(user?.id || 'all');
+                }}
+                className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg text-sm hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
               >
                 Mine Only
               </button>
@@ -292,20 +295,22 @@ function DashboardPage() {
                     </div>
                   )}
                   <div className="flex-1 w-full sm:w-auto">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Member
-                    </label>
-                    <select
-                      value={selectedMember}
-                      onChange={(e) => setSelectedMember(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-                      disabled={!selectedFamily}
+                    <FamilyMembers
+                      familyId={selectedFamily?.id}
+                      selectedMember={selectedMember}
+                      onMemberChange={setSelectedMember}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      onClick={() => {
+                        logger.log('Mine Only button clicked in content area, user ID:', user?.id);
+                        setSelectedMember(user?.id || 'all');
+                      }}
+                      className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg text-sm hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
                     >
-                      <option value="all">All Members</option>
-                      {familyMembers.map(member => (
-                        <option key={member.id} value={member.id}>{member.name}</option>
-                      ))}
-                    </select>
+                      Mine Only
+                    </button>
                   </div>
                   <div className="flex items-center gap-2 w-full sm:w-auto">
                     <input

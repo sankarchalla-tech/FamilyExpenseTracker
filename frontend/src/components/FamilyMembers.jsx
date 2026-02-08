@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { familyAPI } from '../api/family';
 import { useAuth } from '../context/AuthContext';
+import logger from '../utils/logger';
 
 export default function FamilyMembers({ familyId, selectedMember, onMemberChange }) {
   const [members, setMembers] = useState([]);
@@ -34,8 +35,11 @@ export default function FamilyMembers({ familyId, selectedMember, onMemberChange
         </label>
         <select
           value={selectedMember || 'all'}
-          onChange={(e) => onMemberChange(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+          onChange={(e) => {
+            logger.log('FamilyMembers dropdown changed to:', e.target.value);
+            onMemberChange(e.target.value);
+          }}
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white cursor-pointer hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
         >
           <option value="all">All Members</option>
           {members.map((member) => (
@@ -46,12 +50,6 @@ export default function FamilyMembers({ familyId, selectedMember, onMemberChange
           ))}
         </select>
       </div>
-      <button
-        onClick={() => onMemberChange(user?.id)}
-        className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg text-sm"
-      >
-        Mine Only
-      </button>
     </div>
   );
 }
