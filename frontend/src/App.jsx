@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { FamilyProvider } from './context/FamilyContext';
+import { ToastProvider } from './hooks/useToast.jsx';
 import ErrorBoundary from './components/ErrorBoundary';
+import LoadingSpinner from './components/LoadingSpinner';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -16,7 +18,11 @@ function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
   
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <LoadingSpinner size="large" text="Authenticating..." />
+      </div>
+    );
   }
   
   return isAuthenticated ? children : <Navigate to="/login" />;
@@ -26,7 +32,11 @@ function PublicRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
   
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <LoadingSpinner size="large" text="Loading..." />
+      </div>
+    );
   }
   
   return isAuthenticated ? <Navigate to="/dashboard" /> : children;
@@ -89,11 +99,13 @@ function App() {
   return (
     <Router>
       <ErrorBoundary>
-        <AuthProvider>
-          <FamilyProvider>
-            <AppRoutes />
-          </FamilyProvider>
-        </AuthProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <FamilyProvider>
+              <AppRoutes />
+            </FamilyProvider>
+          </AuthProvider>
+        </ToastProvider>
       </ErrorBoundary>
     </Router>
   );

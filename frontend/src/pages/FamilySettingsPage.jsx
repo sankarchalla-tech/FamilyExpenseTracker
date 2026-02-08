@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useFamily } from '../context/FamilyContext';
 import { familyAPI } from '../api/family';
 import FamilyMemberManagement from '../components/FamilyMemberManagement';
+import logger from '../utils/logger';
 
 function FamilySettingsPage() {
   const { user } = useAuth();
@@ -82,7 +83,7 @@ function FamilySettingsPage() {
     try {
       // Note: This would require adding updateFamily API endpoint
       // For now, we'll simulate the update
-      console.log('Updating family settings:', formData);
+      logger.log('Updating family settings:', formData);
       
       setFamily({ ...family, ...formData });
       setEditing(false);
@@ -336,7 +337,7 @@ function FamilySettingsPage() {
 
           {/* Family Member Management */}
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-            {console.log('FamilySettings: isAdmin() =', isAdmin(), 'family.members =', family.members)}
+            {logger.log('FamilySettings: isAdmin() =', isAdmin(), 'family.members =', family.members)}
             {isAdmin() && (
               <FamilyMemberManagement
                 familyId={familyId}

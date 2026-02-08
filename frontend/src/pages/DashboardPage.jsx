@@ -6,6 +6,7 @@ import { familyAPI } from '../api/family';
 import { expenseAPI } from '../api/expense';
 import { categoryAPI } from '../api/category';
 import { analyticsAPI } from '../api/analytics';
+import logger from '../utils/logger';
 
 import CashFlowSummary from '../components/CashFlowSummary';
 import IncomeTable from '../components/IncomeTable';
@@ -13,9 +14,11 @@ import EnhancedExpenseTable from '../components/EnhancedExpenseTable';
 import CategoryDonutChart from '../components/CategoryDonutChart';
 import FutureExpenseTable from '../components/FutureExpenseTable';
 import FamilyMembers from '../components/FamilyMembers';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 function DashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { selectedFamily, setSelectedFamily, isAdmin } = useFamily();
   const [families, setFamilies] = useState([]);
   const [showCreateFamily, setShowCreateFamily] = useState(false);
@@ -26,9 +29,8 @@ function DashboardPage() {
   const [expenses, setExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedMember, setSelectedMember] = useState('all');
-  const [loading, setLoading] = useState(true);
-  const [familyMembers, setFamilyMembers] = useState([]);
-  const navigate = useNavigate();
+   const [loading, setLoading] = useState(true);
+   const [familyMembers, setFamilyMembers] = useState([]);
 
   useEffect(() => {
     loadFamilies();
@@ -48,16 +50,16 @@ function DashboardPage() {
   }, [selectedFamily, selectedMonth, activeTab, selectedMember]);
 
   const loadFamilies = async () => {
-    console.log('Loading families...');
+    logger.log('Loading families...');
     try {
       const data = await familyAPI.getFamilies();
-      console.log('Families loaded:', data);
-      console.log('Number of families:', data.length);
+      logger.log('Families loaded:', data);
+      logger.log('Number of families:', data.length);
       setFamilies(data);
       
       // Force clear any problematic family ID 2 selections
       if (selectedFamily && selectedFamily.id === 2) {
-        console.log('Clearing problematic family ID 2 from selection');
+        logger.log('Clearing problematic family ID 2 from selection');
         setSelectedFamily(null);
         return;
       }
@@ -66,7 +68,7 @@ function DashboardPage() {
       if (selectedFamily && data.length > 0) {
         const isValidFamily = data.some(family => family.id === selectedFamily.id);
         if (!isValidFamily) {
-          console.log('Selected family is not valid, clearing selection');
+          logger.log('Selected family is not valid, clearing selection');
           setSelectedFamily(data[0]);
         }
       } else if (data.length > 0 && !selectedFamily) {
@@ -96,11 +98,11 @@ function DashboardPage() {
     const lastDay = new Date(year, month + 1, 0);
     const endDate = lastDay.toISOString().split('T')[0];
 
-    console.log('Loading analytics:', { familyId, startDate, endDate, memberId });
+    logger.log('Loading analytics:', { familyId, startDate, endDate, memberId });
 
     try {
       const data = await analyticsAPI.getAnalytics(familyId, startDate, endDate, memberId === 'all' ? null : memberId);
-      console.log('Analytics loaded:', data);
+      logger.log('Analytics loaded:', data);
       setAnalytics(data);
     } catch (error) {
       console.error('Error loading analytics:', error);
@@ -109,7 +111,7 @@ function DashboardPage() {
   };
 
   const loadExpenses = async (familyId, memberId = 'all') => {
-    console.log('Loading expenses:', { familyId, memberId });
+    logger.log('Loading expenses:', { familyId, memberId });
     try {
       const year = selectedMonth.getFullYear();
       const month = selectedMonth.getMonth();
@@ -122,7 +124,7 @@ function DashboardPage() {
         filters.userId = parseInt(memberId);
       }
 
-      console.log('Fetching expenses with filters:', filters);
+      logger.log('Fetching expenses with filters:', filters);
 
       const [expensesData, categoriesData] = await Promise.all([
         expenseAPI.getExpenses(familyId, filters),
@@ -175,7 +177,11 @@ function DashboardPage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <LoadingSpinner size="large" text="Loading dashboard..." />
+      </div>
+    );
   }
 
   return (
@@ -183,10 +189,15 @@ function DashboardPage() {
       <nav className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-3">
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+            >
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
                 Family Expense Tracker
               </h1>
+            </button>
+            <div className="flex items-center gap-3">
               {selectedFamily && isAdmin() && (
                 <span className="px-2 py-1 text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 rounded-full font-medium">
                   Admin
@@ -199,8 +210,16 @@ function DashboardPage() {
                   Family
                 </label> */}
                 <select
-                  value={selectedFamily || 'all'}
-                  onChange={(e) => setSelectedFamily(e.target.value)}
+                  value={selectedFamily?.id || 'all'}
+                  onChange={(e) => {
+                    const familyId = e.target.value;
+                    if (familyId === 'all') {
+                      setSelectedFamily(null);
+                    } else {
+                      const family = families.find(f => f.id === familyId);
+                      setSelectedFamily(family);
+                    }
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
                 >
                   <option value="all">All Families</option>
