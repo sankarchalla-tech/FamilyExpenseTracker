@@ -1,0 +1,209 @@
+Server running on port 5000
+=== LOGIN ATTEMPT ===
+Request body: { login: 'testuser', password: 'test123' }
+Login input: testuser
+Password provided: YES
+Searching by username...
+User found: {
+  id: 16,
+  name: 'Test User',
+  email: 'test@test.com',
+  username: 'testuser',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+=== LOGIN ATTEMPT ===
+Request body: { login: 'testuser', password: 'test123' }
+Login input: testuser
+Password provided: YES
+Searching by username...
+User found: {
+  id: 16,
+  name: 'Test User',
+  email: 'test@test.com',
+  username: 'testuser',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+=== LOGIN ATTEMPT ===
+Request body: { login: 'Sankar', password: 'password123' }
+Login input: Sankar
+Password provided: YES
+Searching by username...
+User found: {
+  id: 14,
+  name: 'Sankar',
+  email: 'sankarchalla@zohomail.in',
+  username: 'Sankar',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: false
+INVALID PASSWORD - returning 401
+=== LOGIN ATTEMPT ===
+Request body: { login: 'Sankar', password: '123456' }
+Login input: Sankar
+Password provided: YES
+Searching by username...
+User found: {
+  id: 14,
+  name: 'Sankar',
+  email: 'sankarchalla@zohomail.in',
+  username: 'Sankar',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: false
+INVALID PASSWORD - returning 401
+=== LOGIN ATTEMPT ===
+Request body: { login: 'Sankar', password: 'password' }
+Login input: Sankar
+Password provided: YES
+Searching by username...
+User found: {
+  id: 14,
+  name: 'Sankar',
+  email: 'sankarchalla@zohomail.in',
+  username: 'Sankar',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+=== LOGIN ATTEMPT ===
+Request body: { login: 'Keerthi', password: 'password123' }
+Login input: Keerthi
+Password provided: YES
+Searching by username...
+User found: {
+  id: 15,
+  name: 'Keerthi',
+  email: 'Keerthi@gmail.com',
+  username: 'Keerthi',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+=== LOGIN ATTEMPT ===
+Request body: { login: 'Sankar', password: 'password' }
+Login input: Sankar
+Password provided: YES
+Searching by username...
+User found: {
+  id: 14,
+  name: 'Sankar',
+  email: 'sankarchalla@zohomail.in',
+  username: 'Sankar',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+⚠️  Temporarily skipping family verification for development
+⚠️  Temporarily skipping family verification for development
+=== LOGIN ATTEMPT ===
+Request body: { login: 'sankar', password: 'password' }
+Login input: sankar
+Password provided: YES
+Searching by username...
+User found: NO
+USER NOT FOUND - returning 401
+=== LOGIN ATTEMPT ===
+Request body: { login: 'Sankar', password: 'password' }
+Login input: Sankar
+Password provided: YES
+Searching by username...
+User found: {
+  id: 14,
+  name: 'Sankar',
+  email: 'sankarchalla@zohomail.in',
+  username: 'Sankar',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+⚠️  Temporarily skipping family verification for development
+⚠️  Temporarily skipping family verification for development
+=== LOGIN ATTEMPT ===
+Request body: { login: 'sankar', password: 'password' }
+Login input: sankar
+Password provided: YES
+Searching by username...
+User found: {
+  id: 14,
+  name: 'Sankar',
+  email: 'sankarchalla@zohomail.in',
+  username: 'sankar',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+⚠️  Temporarily skipping family verification for development
+⚠️  Temporarily skipping family verification for development
+=== LOGIN ATTEMPT ===
+Request body: { login: 'keerthi', password: 'password123' }
+Login input: keerthi
+Password provided: YES
+Searching by username...
+User found: NO
+USER NOT FOUND - returning 401
+=== LOGIN ATTEMPT ===
+Request body: { login: 'Keerthi', password: 'password123' }
+Login input: Keerthi
+Password provided: YES
+Searching by username...
+User found: {
+  id: 15,
+  name: 'Keerthi',
+  email: 'Keerthi@gmail.com',
+  username: 'Keerthi',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+⚠️  Temporarily skipping family verification for development
+⚠️  Temporarily skipping family verification for development
+=== LOGIN ATTEMPT ===
+Request body: { login: 'keerthi', password: 'password123' }
+Login input: keerthi
+Password provided: YES
+Searching by username...
+User found: {
+  id: 15,
+  name: 'Keerthi',
+  email: 'Keerthi@gmail.com',
+  username: 'keerthi',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+⚠️  Temporarily skipping family verification for development
+⚠️  Temporarily skipping family verification for development
+=== LOGIN ATTEMPT ===
+Request body: { login: 'sankar', password: 'password' }
+Login input: sankar
+Password provided: YES
+Searching by username...
+User found: {
+  id: 14,
+  name: 'Sankar',
+  email: 'sankarchalla@zohomail.in',
+  username: 'sankar',
+  hasPasswordHash: true
+}
+Comparing passwords...
+Stored hash length: 60
+Password comparison result: true
+⚠️  Temporarily skipping family verification for development
+⚠️  Temporarily skipping family verification for development
