@@ -5,6 +5,7 @@ import { useFamily } from '../context/FamilyContext';
 import { familyAPI } from '../api/family';
 import UserManagement from '../components/UserManagement';
 import FamilyMemberManagement from '../components/FamilyMemberManagement';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 function FamilyPage() {
   const { user } = useAuth();
@@ -71,7 +72,7 @@ function FamilyPage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to add member'
+        text: getErrorMessage(error, 'Failed to add member')
       });
     }
   };
@@ -95,7 +96,7 @@ function FamilyPage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to remove member'
+        text: getErrorMessage(error, 'Failed to remove member')
       });
     }
   };

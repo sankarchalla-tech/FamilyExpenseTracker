@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFamily } from '../context/FamilyContext';
 import { categoryAPI } from '../api/category';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 function CategoriesPage() {
   const { user } = useAuth();
@@ -72,7 +73,7 @@ function CategoriesPage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to create category'
+        text: getErrorMessage(error, 'Failed to create category')
       });
     }
   };
@@ -103,7 +104,7 @@ function CategoriesPage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to update category'
+        text: getErrorMessage(error, 'Failed to update category')
       });
     }
   };
@@ -126,7 +127,7 @@ function CategoriesPage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to delete category'
+        text: getErrorMessage(error, 'Failed to delete category')
       });
     }
   };

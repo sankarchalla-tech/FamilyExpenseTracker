@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { userAPI } from '../api/user';
 import { useNavigate } from 'react-router-dom';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -54,7 +55,7 @@ export default function ProfilePage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to update profile'
+        text: getErrorMessage(error, 'Failed to update profile')
       });
     } finally {
       setLoading(false);
@@ -92,7 +93,7 @@ export default function ProfilePage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to update password'
+        text: getErrorMessage(error, 'Failed to update password')
       });
     } finally {
       setLoading(false);

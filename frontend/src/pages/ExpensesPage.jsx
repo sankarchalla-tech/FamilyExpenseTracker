@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useFamily } from '../context/FamilyContext';
 import { expenseAPI } from '../api/expense';
 import { categoryAPI } from '../api/category';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 function ExpensesPage() {
   const { user } = useAuth();
@@ -66,7 +67,7 @@ function ExpensesPage() {
       setError(null);
     } catch (error) {
       console.error('Error loading data:', error);
-      setError(error.message || 'Failed to load data');
+      setError(getErrorMessage(error, 'Failed to load data'));
     } finally {
       setLoading(false);
     }

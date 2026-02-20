@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { incomeAPI } from '../api/income';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 export default function IncomeTable({ familyId, selectedMonth, selectedMember }) {
   const [incomes, setIncomes] = useState([]);
@@ -83,7 +84,7 @@ export default function IncomeTable({ familyId, selectedMonth, selectedMember })
       loadIncomes();
     } catch (error) {
       console.error('Error saving income:', error);
-      const errorMessage = error.response?.data?.error || error.response?.data?.errors?.[0]?.msg || 'Failed to save income. Please try again.';
+      const errorMessage = getErrorMessage(error, 'Failed to save income. Please try again.');
       setError(errorMessage);
     } finally {
       setLoading(false);

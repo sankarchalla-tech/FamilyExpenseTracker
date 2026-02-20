@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { userAPI } from '../api/user';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 export default function UserManagement({ familyId, familyMembers, onUpdate }) {
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export default function UserManagement({ familyId, familyMembers, onUpdate }) {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to reset password'
+        text: getErrorMessage(error, 'Failed to reset password')
       });
     } finally {
       setLoading(false);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { familyAPI } from '../api/family';
 import { useFamily } from '../context/FamilyContext';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 export default function FamilyMemberManagement({ familyId, isAdmin, familyMembers, onUpdate }) {
   const { selectedFamily, setSelectedFamily: updateSelectedFamily } = useFamily();
@@ -49,7 +50,7 @@ export default function FamilyMemberManagement({ familyId, isAdmin, familyMember
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to add member'
+        text: getErrorMessage(error, 'Failed to add member')
       });
     } finally {
       setLoading(false);
@@ -79,7 +80,7 @@ export default function FamilyMemberManagement({ familyId, isAdmin, familyMember
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to remove member'
+        text: getErrorMessage(error, 'Failed to remove member')
       });
     } finally {
       setLoading(false);
@@ -129,7 +130,7 @@ export default function FamilyMemberManagement({ familyId, isAdmin, familyMember
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to update member'
+        text: getErrorMessage(error, 'Failed to update member')
       });
     } finally {
       setLoading(false);

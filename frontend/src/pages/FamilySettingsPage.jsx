@@ -5,6 +5,7 @@ import { useFamily } from '../context/FamilyContext';
 import { familyAPI } from '../api/family';
 import FamilyMemberManagement from '../components/FamilyMemberManagement';
 import logger from '../utils/logger';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 function FamilySettingsPage() {
   const { user } = useAuth();
@@ -97,7 +98,7 @@ function FamilySettingsPage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to update settings'
+        text: getErrorMessage(error, 'Failed to update settings')
       });
     }
   };
@@ -115,7 +116,7 @@ function FamilySettingsPage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to delete family'
+        text: getErrorMessage(error, 'Failed to delete family')
       });
     }
   };
